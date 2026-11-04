@@ -544,14 +544,7 @@ function runEarlyPluginSdkApiReview({
   for (const tag of new Set(Object.values(bases))) {
     run(
       "git",
-      [
-        "fetch",
-        "--no-tags",
-        "--filter=blob:none",
-        "--depth=1",
-        "origin",
-        `+refs/tags/${tag}:refs/tags/${tag}`,
-      ],
+      ["fetch", "--no-tags", "--filter=blob:none", "origin", `+refs/tags/${tag}:refs/tags/${tag}`],
       { cwd: TOOLING_ROOT },
     );
   }

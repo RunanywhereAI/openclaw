@@ -273,6 +273,90 @@ describe("release candidate checklist", () => {
     }
   });
 
+  it("fetches early Plugin SDK predecessor tags without making a full checkout shallow", () => {
+    const fixtureRoot = tempDirs.make("candidate-sdk-review-history-");
+    const sourceRoot = join(fixtureRoot, "source");
+    const originRoot = join(fixtureRoot, "origin.git");
+    const toolingRoot = join(fixtureRoot, "tooling");
+    const git = (root: string, ...args: string[]) =>
+      run("git", args, { cwd: root, capture: true }).trim();
+    mkdirSync(sourceRoot);
+    git(sourceRoot, "init", "--initial-branch=main");
+    git(sourceRoot, "config", "user.name", "Release Fixture");
+    git(sourceRoot, "config", "user.email", "release-fixture@example.com");
+    git(sourceRoot, "config", "commit.gpgsign", "false");
+    writeJson(join(sourceRoot, "package.json"), { version: "2026.10.21-beta.1" });
+    writeFileSync(join(sourceRoot, "history.txt"), "old\n");
+    git(sourceRoot, "add", ".");
+    git(sourceRoot, "commit", "-m", "test: add old provenance base");
+    git(sourceRoot, "-c", "tag.gpgSign=false", "tag", "v2026.10.19");
+    writeFileSync(join(sourceRoot, "history.txt"), "predecessor\n");
+    git(sourceRoot, "commit", "-am", "test: add predecessor release");
+    git(sourceRoot, "-c", "tag.gpgSign=false", "tag", "v2026.10.20-beta.1");
+    writeFileSync(join(sourceRoot, "history.txt"), "candidate\n");
+    git(sourceRoot, "commit", "-am", "test: add candidate release");
+    run("git", ["clone", "--bare", sourceRoot, originRoot], { capture: true });
+    git(originRoot, "config", "uploadpack.allowFilter", "true");
+    run("git", ["clone", pathToFileURL(originRoot).href, toolingRoot], { capture: true });
+    git(toolingRoot, "tag", "-d", "v2026.10.20-beta.1");
+    const targetSha = git(toolingRoot, "rev-parse", "HEAD");
+    const outputDir = ".artifacts/release-candidate/fixture";
+    const paths = resolveEarlyPluginSdkApiReviewPaths({ outputDir, targetRoot: toolingRoot });
+    const runCommand = run;
+    const reviewOwner = checklistSource.slice(
+      checklistSource.indexOf("function runEarlyPluginSdkApiReview("),
+      checklistSource.indexOf("export function validateParallelsRegistryPackageArtifact("),
+    );
+    const review = runInNewContext(
+      stripNodeTypeScriptTypes(`${reviewOwner}\nrunEarlyPluginSdkApiReview;`),
+      {
+        TOOLING_ROOT: toolingRoot,
+        console: { log: () => {} },
+        isRecord,
+        join,
+        mkdirSync,
+        readFileSync,
+        readJson: (file: string) => JSON.parse(readFileSync(file, "utf8")),
+        requireString: (value: unknown) => String(value),
+        resolveEarlyPluginSdkApiBases,
+        resolveEarlyPluginSdkApiReviewPaths,
+        run: (command: string, args: string[], options?: { cwd?: string }) => {
+          if (command === "npm") {
+            return JSON.stringify({ beta: "2026.10.20-beta.1" });
+          }
+          if (command === "pnpm") {
+            mkdirSync(paths.reviewDir, { recursive: true });
+            writeJson(paths.evidencePath, {});
+            writeFileSync(paths.reportPath, "fixture review\n");
+            writeJson(paths.diffPath, {});
+            return "";
+          }
+          return runCommand(command, args, { ...options, capture: true });
+        },
+        validatePluginSdkApiReleaseEvidence: () => ({ status: "passed" }),
+      },
+    ) as (params: {
+      npmDistTag: string;
+      outputDir: string;
+      targetRoot: string;
+      targetSha: string;
+      toolingSha: string;
+    }) => unknown;
+
+    expect(git(toolingRoot, "rev-parse", "--is-shallow-repository")).toBe("false");
+    review({
+      npmDistTag: "beta",
+      outputDir,
+      targetRoot: toolingRoot,
+      targetSha,
+      toolingSha: targetSha,
+    });
+    expect(git(toolingRoot, "rev-parse", "--is-shallow-repository")).toBe("false");
+    expect(() =>
+      git(toolingRoot, "merge-base", "--is-ancestor", "v2026.10.19", targetSha),
+    ).not.toThrow();
+  });
+
   it.each<[string[], string]>([
     [
       ["--workflow-sha", "b".repeat(40), "--publish-workflow-ref", publishWorkflowRef],
