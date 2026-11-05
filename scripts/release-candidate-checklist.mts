@@ -511,6 +511,18 @@ export function resolveEarlyPluginSdkApiReviewPaths({
   };
 }
 
+function assertEarlyPluginSdkApiReviewHasFullHistory() {
+  const shallow = run("git", ["rev-parse", "--is-shallow-repository"], {
+    capture: true,
+    cwd: TOOLING_ROOT,
+  }).trim();
+  if (shallow === "true") {
+    throw new Error(
+      "release:candidate requires a full-history checkout before early Plugin SDK review. Run git fetch --unshallow --filter=blob:none origin from the release checkout, then rerun.",
+    );
+  }
+}
+
 function runEarlyPluginSdkApiReview({
   npmDistTag,
   outputDir,
@@ -2078,6 +2090,7 @@ async function main() {
   const options = parseArgs(process.argv.slice(2));
   const targetRoot = gitTopLevel(process.cwd());
   const toolingRoot = gitTopLevel(TOOLING_ROOT);
+  assertEarlyPluginSdkApiReviewHasFullHistory();
   if (targetRoot === toolingRoot) {
     runFromTrustedTooling(process.argv.slice(2), {
       targetRoot,

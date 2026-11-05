@@ -273,7 +273,7 @@ describe("release candidate checklist", () => {
     }
   });
 
-  it("fetches early Plugin SDK predecessor tags without making a full checkout shallow", () => {
+  it("preserves full history and rejects shallow Plugin SDK predecessor fetches", async () => {
     const fixtureRoot = tempDirs.make("candidate-sdk-review-history-");
     const sourceRoot = join(fixtureRoot, "source");
     const originRoot = join(fixtureRoot, "origin.git");
@@ -355,6 +355,38 @@ describe("release candidate checklist", () => {
     expect(() =>
       git(toolingRoot, "merge-base", "--is-ancestor", "v2026.10.19", targetSha),
     ).not.toThrow();
+    expect(git(toolingRoot, "show-ref", "--verify", "refs/tags/v2026.10.20-beta.1")).toContain(
+      "refs/tags/v2026.10.20-beta.1",
+    );
+
+    const shallowRoot = join(fixtureRoot, "shallow");
+    run("git", ["clone", "--depth=1", "--no-tags", pathToFileURL(originRoot).href, shallowRoot], {
+      capture: true,
+    });
+    const runFromTrustedTooling = vi.fn();
+    const completion = runInNewContext(
+      stripNodeTypeScriptTypes(
+        `${checklistFunctions("assertEarlyPluginSdkApiReviewHasFullHistory", "main")}\nmain();`,
+      ),
+      {
+        TOOLING_ROOT: shallowRoot,
+        parseArgs: () => ({ workflowRef: "main", workflowSha: "" }),
+        process: {
+          argv: ["node", "scripts/release-candidate-checklist.mts"],
+          cwd: () => shallowRoot,
+        },
+        gitTopLevel: () => shallowRoot,
+        runFromTrustedTooling,
+        run: (command: string, args: string[], options?: { cwd?: string }) =>
+          runCommand(command, args, { ...options, capture: true }),
+      },
+    ) as Promise<void>;
+    expect(git(shallowRoot, "rev-parse", "--is-shallow-repository")).toBe("true");
+    await expect(completion).rejects.toThrow("requires a full-history checkout");
+    expect(runFromTrustedTooling).not.toHaveBeenCalled();
+    expect(() =>
+      git(shallowRoot, "show-ref", "--verify", "refs/tags/v2026.10.20-beta.1"),
+    ).toThrow();
   });
 
   it.each<[string[], string]>([
@@ -696,7 +728,7 @@ describe("release candidate checklist", () => {
       const dispatches: string[][] = [];
       const completion = runInNewContext(
         stripNodeTypeScriptTypes(
-          `${checklistFunctions("checkCandidateAndroidVersion", "publicationSelectionForChecklist", "canUpdateReleaseCandidateState", "savedPublishWorkflowRef", "dispatchFullReleaseUsingHelper", "shellQuote", "formatPluginSdkApiAcknowledgementFailure", "main")}\nmain();`,
+          `${checklistFunctions("checkCandidateAndroidVersion", "publicationSelectionForChecklist", "canUpdateReleaseCandidateState", "savedPublishWorkflowRef", "dispatchFullReleaseUsingHelper", "shellQuote", "formatPluginSdkApiAcknowledgementFailure", "assertEarlyPluginSdkApiReviewHasFullHistory", "main")}\nmain();`,
         ),
         {
           ...coordinatorContext,

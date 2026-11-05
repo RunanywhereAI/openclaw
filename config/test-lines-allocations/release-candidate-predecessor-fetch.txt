@@ -1,2 +1,2 @@
-# Real-Git regression preserves full release-tooling history while fetching predecessor tags.
-84
+# Real-Git coverage preserves full release-tooling history and rejects shallow predecessor fetches.
+116
