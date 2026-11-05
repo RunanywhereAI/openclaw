@@ -14,7 +14,6 @@ import { registerEnglishCatalog, t } from "../../lib/reactive/i18n.ts";
 import "./custom-elements.ts";
 import { renderPluginCapabilitySection as PluginCapabilitySection } from "./overview.tsx";
 import { showPluginToolPreview, type PluginToolPreview } from "./tool-preview.tsx";
-import "./skill-preview.css";
 
 registerEnglishCatalog(registerPluginManagementEnglish);
 

@@ -633,27 +633,17 @@
 
   .dreams__moon {
     top: 8px;
-    right: 12px;
     width: 52px;
     height: 52px;
   }
 
   .dreams__bubble {
     top: calc(var(--dreams-sleeper-y) - 236px);
-    left: 0;
-    right: 0;
-    width: fit-content;
-    max-width: 100%;
-    margin-inline: auto;
-    box-sizing: border-box;
-    padding: 14px 18px;
   }
 
   .dreams__bubble-text {
     display: block;
     min-width: 0;
-    font-size: 15px;
-    text-wrap: balance;
   }
 
   .dreams__bubble-dot--far {
