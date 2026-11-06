@@ -1718,12 +1718,6 @@ openclaw-chat-video-player {
   gap: 2px;
 }
 
-.session-suggestion__action {
-  width: 28px;
-  height: 28px;
-}
-
-.session-suggestion__action svg,
 .task-suggestion__header-action svg,
 .chat-pr__icon svg,
 .chat-pr__warning svg,
@@ -3252,7 +3246,6 @@ openclaw-chat-ci-details {
 
 .chat-annotation-editor .chat-annotation-editor__delete {
   margin-right: auto;
-  padding: 4px;
 }
 
 .chat-provider-review-dialog__content {

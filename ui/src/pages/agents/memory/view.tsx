@@ -2,6 +2,7 @@ import { parseDateStringTimestampMs } from "@openclaw/normalization-core/number-
 import type { JSX } from "@solidjs/web";
 import { createMemo, createUniqueId, For, Show } from "solid-js";
 import { Icon } from "../../../components/solid/icon.tsx";
+import { IconButton } from "../../../components/solid/icon-button.tsx";
 import { MarkdownHtml } from "../../../components/solid/markdown-html.tsx";
 import { Menu, type MenuEntry } from "../../../components/solid/menu.tsx";
 import { RefreshButton } from "../../../components/solid/refresh-button.tsx";
@@ -256,24 +257,18 @@ function DiaryPager(props: {
           onChange={(event) => props.onSelect(Number(event.currentTarget.value))}
         />
         <span class="dreams-diary__steps">
-          <button
-            type="button"
-            class="btn btn--icon btn--ghost"
-            aria-label={t("dreaming.diary.older")}
+          <IconButton
+            icon="chevronLeft"
+            label={t("dreaming.diary.older")}
             disabled={props.selectedPage >= props.entries.length - 1}
             onClick={() => props.onSelect(props.selectedPage + 1)}
-          >
-            <Icon name="chevronLeft" />
-          </button>
-          <button
-            type="button"
-            class="btn btn--icon btn--ghost"
-            aria-label={t("dreaming.diary.newer")}
+          />
+          <IconButton
+            icon="chevronRight"
+            label={t("dreaming.diary.newer")}
             disabled={props.selectedPage <= 0}
             onClick={() => props.onSelect(props.selectedPage - 1)}
-          >
-            <Icon name="chevronRight" />
-          </button>
+          />
         </span>
       </Show>
     </div>
@@ -465,7 +460,7 @@ function MaintenanceMenu(props: DreamingProps) {
       label={t("browser.moreActions")}
       placement="bottom-end"
       pointerFocus="trigger"
-      triggerClass="btn btn--icon btn--ghost"
+      triggerClass="oc-icon-button"
       trigger={<Icon name="moreHorizontal" />}
       items={items()}
       onSelect={(item) => {

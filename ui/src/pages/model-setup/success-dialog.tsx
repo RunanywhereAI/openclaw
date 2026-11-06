@@ -4,6 +4,7 @@ import {
   providerIdFromModelRef,
 } from "../../components/provider-icon-data.ts";
 import { Icon } from "../../components/solid/icon.tsx";
+import { IconButton } from "../../components/solid/icon-button.tsx";
 import "../../components/modal-dialog.tsx";
 import { registerModelSetupEnglish } from "../../i18n/locales/en-model-setup.ts";
 import { t } from "../../lib/reactive/i18n.ts";
@@ -55,14 +56,13 @@ export function ModelSetupSuccessDialog(
               </Show>
               {title()}
             </h2>
-            <button
-              type="button"
+            <IconButton
+              size={28}
               class="oc-dialog__close"
-              aria-label={t("common.close")}
+              icon="x"
+              label={t("common.close")}
               onClick={() => props.onSuccessClose()}
-            >
-              <Icon name="x" />
-            </button>
+            />
             <Show when={!props.activation.warning}>
               <div class="oc-dialog__description">
                 <p>{description()}</p>
