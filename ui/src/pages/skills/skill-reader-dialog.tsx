@@ -54,6 +54,7 @@ export function SkillReaderDialog(props: {
             class="oc-dialog__close"
             icon="x"
             label={t("skillsPage.close")}
+            tooltip={false}
             onClick={() => props.onClose()}
           />
         </div>

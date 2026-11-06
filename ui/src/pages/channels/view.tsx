@@ -568,6 +568,7 @@ function WizardDialog(props: { controls: ChannelsProps }) {
             class="oc-dialog__close"
             icon="x"
             label={t("common.close")}
+            tooltip={false}
             onClick={() => props.controls.wizardHost.close()}
           />
           <div class="oc-dialog__description">
