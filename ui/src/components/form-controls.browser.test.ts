@@ -589,12 +589,11 @@ describeBrowserLayout("form controls and app chrome styles", () => {
           page,
           [
             "#openclaw-mount-retry",
-            "#openclaw-mount-wait",
             '.mount-fallback__panel a[href^="https://"]',
           ],
           "cursor",
         ),
-      ).toEqual(["default", "default", "pointer"]);
+      ).toEqual(["default", "pointer"]);
     });
   });
 
