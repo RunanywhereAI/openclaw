@@ -359,6 +359,7 @@ describe("People page", () => {
     );
     expect(request).not.toHaveBeenCalledWith("openclawId.people", {});
     expect(container.textContent).not.toContain("member@example.test");
+    expect(button(container, "Add node")).toBeUndefined();
   });
 
   it("is read-only in a browser that is not an owner device", async () => {
@@ -370,6 +371,7 @@ describe("People page", () => {
       expect(container.textContent).toContain("can view people but cannot change access"),
     );
     expect(button(container, "Approve")?.disabled).toBe(true);
+    expect(button(container, "Add node")).toBeUndefined();
   });
 
   it("registers only owner Pages navigation, and removes it on disconnect", async () => {
