@@ -59,8 +59,11 @@ const controlUiPerformanceBudgets = {
   newBootCssRequests: 3,
   // Generated-name-normalized main measurement plus 64 B toolchain headroom.
   // Coordinator accepted transcript mounting's minifier variance; complete build plus 64 B.
-  chatBootJsGzipBytes: 1_287_669,
-  newBootJsGzipBytes: 796_484,
+  // Josh Lehman approved the OpenClaw ID sidebar mounts and sign-in callback check
+  // (#192352, 2026-11-06): on main 0a6590652dc this branch measures Chat 1,288,774 B
+  // and New Session 797,124 B; main's concurrent growth gets 256 B of headroom.
+  chatBootJsGzipBytes: 1_289_030,
+  newBootJsGzipBytes: 797_380,
   startupCssRequests: 1,
   // Solid 2 action/optimistic runtime adoption; offset tracked by HF-STARTUP-BUDGET.
   // Jacob Tomlinson approved +50 B for native inline views (#173135, 2026-10-22).
