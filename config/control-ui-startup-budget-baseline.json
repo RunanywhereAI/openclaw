@@ -1,5 +1,5 @@
 {
-  "startupJsGzipBytes": 89370,
-  "reason": "Retire unused browser fallbacks, dead English copy, and unused theme validator initialization; measured startup 89,370 B normalized gzip.",
-  "updatedAt": "2026-11-06"
+  "startupJsGzipBytes": 90139,
+  "reason": "PR #194142 (L293): cached Details first-frame prewarm starts in startup; the shared idle-import owner enters the startup chunk. Native Details co-frame 0/11 to 11/11 on both chats, lag 688/840 to 0 ms; complete-page LoAF paired -79.2/-113.5 ms. CI base 4199080 measured Startup 89481 to 90139 B (+658 B), with unchanged Startup/Chat/New request counts 3/20/15. The lead accepted the native first-rows/full-window LoAF tradeoff; Team-scale has no adverse secondary.",
+  "updatedAt": "2026-11-07"
 }
